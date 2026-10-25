@@ -1,0 +1,57 @@
+# Build directories and outputs
+build/
+build_*/
+cmake-build-*/
+bin/
+out/
+
+# Build artifacts & binary objects
+*.o
+*.obj
+*.elf
+*.hex
+*.bin
+*.map
+*.a
+*.so
+*.dylib
+*.d
+
+# Ninja & CMake transient files
+.ninja_deps
+.ninja_log
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+compile_commands.json
+
+# Zephyr / West workspace artifacts
+.west/
+zephyr/
+modules/
+.zephyr_deps_installed
+.*_blobs
+*.blobs
+
+# Python virtual environment & cache
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Logs & serial telemetry captures
+*.log
+*.csv
+
+# OS and Editor specific files
+.DS_Store
+._*
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

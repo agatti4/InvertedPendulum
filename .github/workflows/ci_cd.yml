@@ -1,0 +1,55 @@
+name: CI Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  linux-build:
+    runs-on: ubuntu-24.04
+    name: Linux Build
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v7.0.0
+        with:
+          python-version: '3.12'
+
+      - name: Build
+        env:
+          DOCKER_EXE: docker
+        run: |
+          # Build the docker image (simulating the environment)
+          docker compose build
+          
+          # Run the build
+          chmod +x BuildView.sh
+          ./BuildView.sh build nucleo
+  
+  clang-format-check:
+    runs-on: ubuntu-24.04
+    name: ClangFormat Check
+    steps:
+      - uses: actions/checkout@v7.0.1
+
+      - name: Install dependencies (Clang 20)
+        run: |
+          sudo apt update
+          sudo apt install -y wget gnupg lsb-release
+          wget https://apt.llvm.org/llvm.sh
+          chmod +x llvm.sh
+          sudo ./llvm.sh 20
+          sudo apt install -y clang-20 clang-format-20 cmake ninja-build
+          sudo ln -sf /usr/bin/clang-format-20 /usr/bin/clang-format
+          sudo ln -sf /usr/bin/clang-20 /usr/bin/clang
+          sudo ln -sf /usr/bin/clang++-20 /usr/bin/clang++
+
+      - name: Run clang-format check
+        run: |
+          chmod +x BuildView.sh
+          chmod +x scripts/host/runClangFormat.sh
+          ./BuildView.sh runClangFormat check
