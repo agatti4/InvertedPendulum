@@ -1,0 +1,22 @@
+version: "3.8"
+
+services:
+  zephyr:
+    build: .
+    container_name: zephyr-dev
+    working_dir: /workspace
+
+    volumes:
+      - ./:/workspace
+      - zephyr-cache:/root/.cache
+      - venv-data:/opt/venv
+
+    environment:
+      - ZEPHYR_BASE=/workspace/zephyr
+
+    tty: true
+    stdin_open: true
+
+volumes:
+  zephyr-cache:
+  venv-data:
