@@ -1,0 +1,108 @@
+/ {
+	aliases {
+		motor-pwm = &motor_pwm_node;
+		motor-dir = &motor_dir_pin;
+		motor-inhibit = &motor_inhibit_pin;
+		qdec0 = &qdec8;
+		qdec1 = &qdec1;
+	};
+
+	pwm_motors {
+		compatible = "pwm-leds";
+		motor_pwm_node: motor_pwm_node {
+			pwms = <&pwm4 3 PWM_USEC(50) PWM_POLARITY_NORMAL>;
+			label = "Motor PWM";
+		};
+	};
+
+	motor_ctrl_node: motor_ctrl_node {
+		compatible = "gpio-leds";
+		motor_dir_pin: motor_dir_pin_0 {
+			gpios = <&gpiob 9 GPIO_ACTIVE_HIGH>;
+			label = "Motor Direction (D14/SDA)";
+		};
+		motor_inhibit_pin: motor_inhibit_pin_0 {
+			gpios = <&gpioa 5 GPIO_ACTIVE_HIGH>;
+			label = "Motor Inhibit (D13)";
+		};
+	};
+};
+
+/* Encoder on PC6/PC7 using TIM8 */
+&timers8 {
+	status = "okay";
+	qdec8: qdec {
+		compatible = "st,stm32-qdec";
+		pinctrl-0 = <&tim8_ch1_pc6 &tim8_ch2_pc7>;
+		pinctrl-names = "default";
+
+		st,input-filter-level = <0>;
+		st,encoder-mode = <0x3>;
+		st,counts-per-revolution = <4096>;
+
+		status = "okay";
+	};
+};
+
+/* Encoder on PE9/PE11 using TIM1 */
+&timers1 {
+	st,prescaler = <0>;
+	status = "okay";
+	qdec1: qdec {
+		compatible = "st,stm32-qdec";
+		pinctrl-0 = <&tim1_ch1_pe9 &tim1_ch2_pe11>;
+		pinctrl-names = "default";
+
+		st,input-filter-level = <0>;
+		st,encoder-mode = <0x3>;
+		st,counts-per-revolution = <4000>;
+
+		status = "okay";
+	};
+};
+
+&pwm1 {
+	status = "disabled";
+};
+
+/* Disable SPI1 to free up PA5 (SCK) */
+&spi1 {
+	status = "disabled";
+};
+
+/* Ensure I2C1 is disabled to free up PB8/PB9 */
+&i2c1 {
+	status = "disabled";
+};
+
+/* I2C4 for OLED */
+&i2c4 {
+	status = "okay";
+	pinctrl-0 = <&i2c4_scl_pf14 &i2c4_sda_pf15>;
+	pinctrl-names = "default";
+	clock-frequency = <I2C_BITRATE_FAST>;
+
+	ssd1306: ssd1306@3c {
+		compatible = "solomon,ssd1306";
+		reg = <0x3c>;
+		width = <128>;
+		height = <64>;
+		segment-offset = <0>;
+		page-offset = <0>;
+		display-offset = <0>;
+		multiplex-ratio = <63>;
+		segment-remap;
+		com-invdir;
+		prechargep = <0x22>;
+	};
+};
+
+&timers4 {
+	status = "okay";
+	st,prescaler = <100>;
+	pwm4: pwm {
+		status = "okay";
+		pinctrl-0 = <&tim4_ch3_pb8>;
+		pinctrl-names = "default";
+	};
+};
